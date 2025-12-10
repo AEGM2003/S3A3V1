@@ -2,7 +2,7 @@
     import ToDo from './ToDo.svelte';
 </script>
 
-<h1>My Gift List</h1>
+<h1>My Gift List App</h1>
 <style>
     :root {
          --titles: 'Calistoga', system-ui;
