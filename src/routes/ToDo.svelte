@@ -1,6 +1,21 @@
 <script>
+    import {onMount} from 'svelte';
+
     let todoItem = $state('');
     let todoList = $state([]);
+
+    onMount(()=> {
+        let storedList = localStorage.getItem("storedList");
+        if (storedList) {
+            todoList = (JSON.parse(storedList));
+        }
+    })
+
+    function updateList() {
+        return localStorage.setItem("storedList", JSON.stringify(todoList));
+    }
+
+
     // Add todo item to todo list
     function addItem(event) {
         event.preventDefault();
@@ -11,11 +26,18 @@
             text: todoItem,
             done: false
         }];
+        updateList();
         todoItem = '';
     }   
     // Remove item from todo list
     function removeItem(index) {
         todoList.splice(index,1);
+        updateList();
+    }
+
+    function clearAll() {
+        todoList = '';
+        localStorage.clear();
     }
 
 
@@ -30,7 +52,7 @@
         <ul>
             {#each todoList as item, index}
             <li>
-                <input type="checkbox" bind:checked={item.done}>
+                <input type="checkbox" bind:checked={item.done} onChange={updateList()}>
                 <span class:done={item.done}>{item.text}</span>
                 <button class="my-buttons" type="button" onclick={() => removeItem(index)}>&times;</button>
             </li>
@@ -38,11 +60,17 @@
         </ul>
     </div>
 
-
+    {#if todoList.length > 0}
+    <button class="clearAll" onclick={clearAll}>Clear All</button>
+    {:else}
+    <button class="clearAll" disabled>Clear All</button>
+    {/if}
 
 <style>
     :root {
         --pink: #EED0F2;
+        --lightRed: #FDAAAA;
+        --red: #BF0B1A;
         --lavender: #CEB3F2;
         --lilac: #C9BDF2;
         --blue: #B6D6F2;
@@ -55,6 +83,12 @@
     ul{
         list-style: none;
         color: black;
+        font-family: var(--text);
+    }
+    input[type="text"] {
+        background-color: var(--blue);
+        border: 2.5px black outset;
+        border-radius: 5px;
         font-family: var(--text);
     }
     input[type="checkbox"]{
@@ -81,4 +115,15 @@
         transform: scale(1.1);
         background-color: var(--lightBlue);
         }
+    .clearAll {
+        background-color: var(--lightRed);
+        transition: transform 0.3s ease-in-out;
+        transition: background-color 0.3s ease;
+        
+    }
+    .clearAll:hover {
+        transform: scale(1.1);
+        background-color: var(--red);
+        }
+    
 </style>
